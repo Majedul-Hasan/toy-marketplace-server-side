@@ -25,6 +25,12 @@ async function run() {
       res.send({ token });
     });
 
+     app.get('/toys', async (req, res) => {
+       const cursor = toysCollection.find({});
+       const result = await cursor.toArray();
+       res.send(result);
+     });
+
     app.post('/toys', verifyJWT, async (req, res) => {
       const toy = req.body;
       console.log(toy);
