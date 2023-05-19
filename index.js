@@ -4,6 +4,7 @@ const app = express();
 const cors = require('cors');
 const { dbConnect, client } = require('./config/configDB');
 const generateToken = require('./utils/generateToken');
+const { verifyJWT } = require('./middleware/authMiddleware');
 const port = process.env.PORT || 5000;
 
 app.use(cors());
@@ -22,6 +23,13 @@ async function run() {
       const token = generateToken(user);
       // console.log(token);
       res.send({ token });
+    });
+
+    app.post('/toys', verifyJWT, async (req, res) => {
+      const toy = req.body;
+      console.log(toy);
+      const result = await toysCollection.insertOne(toy);
+      res.send(result);
     });
   } finally {
     // Ensures that the client will close when you finish/error
