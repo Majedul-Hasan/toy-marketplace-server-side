@@ -46,6 +46,22 @@ async function run() {
       return res.send(blog);
     });
 
+      app.get('/blogs-list', async (req, res) => {
+        //  dbConnect()
+        const query = {};
+        const options = {
+          // Include only the `title` and `imdb` fields in the returned document
+          projection: { title: 1 },
+        };
+
+        const cursor = blogsCollection.find(query, options);
+        const result = await cursor.toArray();
+        res.send(result);
+      });
+
+
+
+
     app.get('/toys', async (req, res) => {
       const cursor = toysCollection.find({});
       const result = await cursor.toArray();
