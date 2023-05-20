@@ -51,7 +51,7 @@ async function run() {
         const query = {};
         const options = {
           // Include only the `title` and `imdb` fields in the returned document
-          projection: { title: 1 },
+          projection: { title: 1, slug: 1 },
         };
 
         const cursor = blogsCollection.find(query, options);
