@@ -48,6 +48,33 @@ async function run() {
       res.send(result);
     });
 
+    // single toy update
+    app.patch('/toys/:id', verifyJWT, async (req, res) => {
+      const id = req.params.id;
+      console.log(req.decoded);
+      const email = req.decoded?.email;
+      const filter = { _id: new ObjectId(id) };
+      const toy = await toysCollection.findOne(filter);
+      const options = { upsert: false };
+      const updatedToy = req.body;
+      if (email === toy['seller-email']) {
+        console.log(updatedToy);
+        const updateDoc = {
+          $set: {
+            ...updatedToy,
+          },
+        };
+        const result = await toysCollection.updateOne(
+          filter,
+          updateDoc,
+          options
+        );
+        res.send(result);
+      } else {
+        res.status(403).send({ error: true, message: 'unauthorized access' });
+      }
+    });
+
     // single toy delete
     app.delete('/toys/:id', verifyJWT, async (req, res) => {
       const id = req.params.id;
