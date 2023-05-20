@@ -47,6 +47,22 @@ async function run() {
       const result = await toysCollection.findOne(query);
       res.send(result);
     });
+
+    // single toy delete
+    app.delete('/toys/:id', verifyJWT, async (req, res) => {
+      const id = req.params.id;
+      console.log(req.decoded);
+      const email = req.decoded?.email;
+      const query = { _id: new ObjectId(id) };
+      const toy = await toysCollection.findOne(query);
+
+      if (email === toy['seller-email']) {
+        const result = await toysCollection.deleteOne(query);
+        res.send(result);
+      } else {
+        res.status(403).send({ error: true, message: 'unauthorized access' });
+      }
+    });
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
