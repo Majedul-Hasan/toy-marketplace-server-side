@@ -36,9 +36,16 @@ async function run() {
       const result = await cursor.toArray();
       res.send(result);
     });
-   
+    //single blog
+    app.get('/blogs/:slug', async (req, res) => {
+      const slug = req.params.slug;
+      const query = { slug: slug };
 
-   
+      const blog = await blogsCollection.findOne(query);
+
+      return res.send(blog);
+    });
+
     app.get('/toys', async (req, res) => {
       const cursor = toysCollection.find({});
       const result = await cursor.toArray();
