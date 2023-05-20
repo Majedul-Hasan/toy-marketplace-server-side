@@ -5,6 +5,7 @@ const cors = require('cors');
 const { dbConnect, client } = require('./config/configDB');
 const generateToken = require('./utils/generateToken');
 const { verifyJWT } = require('./middleware/authMiddleware');
+const { ObjectId } = require('mongodb');
 const port = process.env.PORT || 5000;
 
 app.use(cors());
@@ -13,6 +14,7 @@ app.use(express.json());
 async function run() {
   try {
     dbConnect();
+
     const database = client.db('toys-zone');
     const toysCollection = database.collection('toys');
 
@@ -25,15 +27,15 @@ async function run() {
       res.send({ token });
     });
 
-     app.get('/toys', async (req, res) => {
-       const cursor = toysCollection.find({});
-       const result = await cursor.toArray();
-       res.send(result);
-     });
-
+    app.get('/toys', async (req, res) => {
+      const cursor = toysCollection.find({});
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+    // single toy creation
     app.post('/toys', verifyJWT, async (req, res) => {
       const toy = req.body;
-      console.log(toy);
+      // console.log(toy);
       const result = await toysCollection.insertOne(toy);
       res.send(result);
     });
