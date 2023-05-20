@@ -1,15 +1,18 @@
 const express = require('express');
+const bodyParser = require('body-parser');
+
 require('dotenv').config();
 const app = express();
 const cors = require('cors');
 const { dbConnect, client } = require('./config/configDB');
 const generateToken = require('./utils/generateToken');
 const { verifyJWT } = require('./middleware/authMiddleware');
-const { ObjectId } = require('mongodb');
+const { ObjectId, Binary } = require('mongodb');
 const port = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(express.json());
+app.use(bodyParser.json());
 
 async function run() {
   try {
@@ -17,6 +20,7 @@ async function run() {
 
     const database = client.db('toys-zone');
     const toysCollection = database.collection('toys');
+    const blogsCollection = database.collection('programmingBlogs');
 
     // jwt authentication
     app.post('/jwt', (req, res) => {
@@ -27,6 +31,14 @@ async function run() {
       res.send({ token });
     });
 
+    app.get('/blogs', async (req, res) => {
+      const cursor = blogsCollection.find({});
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+   
+
+   
     app.get('/toys', async (req, res) => {
       const cursor = toysCollection.find({});
       const result = await cursor.toArray();
@@ -82,6 +94,7 @@ async function run() {
       console.log(email);
       const query = { _id: new ObjectId(id) };
       const toy = await toysCollection.findOne(query);
+      console.log(toy);
 
       if (email === toy['seller-email']) {
         const result = await toysCollection.deleteOne(query);
@@ -97,7 +110,7 @@ async function run() {
       const email = req.decoded?.email;
       const query = { 'seller-email': email };
 
-      console.log(email);
+      // console.log(email);
 
       const cursor = toysCollection.find(query);
       const result = await cursor.toArray();
@@ -117,3 +130,20 @@ app.get('/', (req, res) => {
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });
+
+
+
+/**
+  app.get('/blogs/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const options = {
+        // Include only the `title` and `imdb` fields in the returned document
+        projection: { _id: 1, photo: 1 },
+      };
+      const blog = await blogsCollection.findOne(query, options);
+      res.set('Content-Type', blog.photo.contentType);
+      return res.send(blog.photo.data);
+    });
+  
+ */
