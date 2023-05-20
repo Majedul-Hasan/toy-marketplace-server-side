@@ -78,8 +78,8 @@ async function run() {
     // single toy delete
     app.delete('/toys/:id', verifyJWT, async (req, res) => {
       const id = req.params.id;
-      console.log(req.decoded);
       const email = req.decoded?.email;
+      console.log(email);
       const query = { _id: new ObjectId(id) };
       const toy = await toysCollection.findOne(query);
 
@@ -89,6 +89,19 @@ async function run() {
       } else {
         res.status(403).send({ error: true, message: 'unauthorized access' });
       }
+    });
+
+    // my toys
+
+    app.get('/my-toys', verifyJWT, async (req, res) => {
+      const email = req.decoded?.email;
+      const query = { 'seller-email': email };
+
+      console.log(email);
+
+      const cursor = toysCollection.find(query);
+      const result = await cursor.toArray();
+      res.send(result);
     });
   } finally {
     // Ensures that the client will close when you finish/error

@@ -9,7 +9,7 @@ const verifyJWT = (req, res, next) => {
       .send({ error: true, message: 'unauthorized access' });
   }
   const token = authorization.split(' ')[1];
-  console.log(token);
+  // console.log(token);
   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
     if (err) {
       return res.status(401).send({ error: true, message: err });
