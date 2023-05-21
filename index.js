@@ -98,7 +98,21 @@ async function run() {
       res.send(result);
     });
     // new arived
+
     app.get('/toys-new', async (req, res) => {
+      console.log(req.query);
+
+      const cursor = toysCollection.find({});
+      const result = await cursor
+        .sort({ createdAt: -1 })
+        .collation({ locale: 'en_US', numericOrdering: true })
+        .limit(6)
+        .toArray();
+      res.send(result);
+    });
+
+    // new tave
+    app.get('/toys-new2', async (req, res) => {
       console.log(req.query);
 
       const cursor = toysCollection.find({});
