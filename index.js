@@ -112,15 +112,15 @@ async function run() {
     });
 
     // new tave
-    app.get('/toys-new2', async (req, res) => {
+    app.get('/toys-cate', async (req, res) => {
       console.log(req.query);
+      const options = {
+        // Include only the `title` and `imdb` fields in the returned document
+        projection: { category: 1 },
+      };
 
-      const cursor = toysCollection.find({});
-      const result = await cursor
-        .sort({ createdAt: -1 })
-        .collation({ locale: 'en_US', numericOrdering: true })
-        .limit(6)
-        .toArray();
+      const cursor = toysCollection.find({}, options);
+      const result = await cursor.toArray();
       res.send(result);
     });
     app.get('/total-toys', async (req, res) => {
@@ -140,6 +140,12 @@ async function run() {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await toysCollection.findOne(query);
+      res.send(result);
+    });
+    // single toy get
+    app.get('/toys-by-cat', async (req, res) => {
+      const { cate } = req.query;
+      const result = await toysCollection.find({ category: cate }).toArray();
       res.send(result);
     });
 
