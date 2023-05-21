@@ -151,14 +151,35 @@ async function run() {
     // my toys
 
     app.get('/my-toys', verifyJWT, async (req, res) => {
+      const queryStr = req.query.sort;
+
+      console.log(queryStr);
       const email = req.decoded?.email;
       const query = { 'seller-email': email };
 
-      // console.log(email);
+      // const options = {
+      //   // sort returned documents in ascending order by title (A->Z)
+      //   sort: { price: queryStr === 'asc' ? 1 : -1 },
+      //   // Include only the `title` and `imdb` fields in each returned document
+      // };
 
-      const cursor = toysCollection.find(query);
-      const result = await cursor.toArray();
-      res.send(result);
+      // console.log(email);
+      if (queryStr) {
+        const cursor = toysCollection.find(query);
+        const result = await cursor
+          .sort({ price: queryStr === 'asc' ? 1 : -1 })
+          .collation({ locale: 'en_US', numericOrdering: true })
+          .toArray();
+        res.send(result);
+      } else {
+        const cursor = toysCollection.find(query);
+        const result = await cursor.toArray();
+        res.send(result);
+      }
+
+
+
+      
     });
   } finally {
     // Ensures that the client will close when you finish/error
