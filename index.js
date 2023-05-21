@@ -83,6 +83,20 @@ async function run() {
       const result = await cursor.skip(skip).limit(limit).toArray();
       res.send(result);
     });
+    //gallery
+    app.get('/toys-pic', async (req, res) => {
+      console.log(req.query);
+      const page = parseInt(req.query.page) || 0;
+      const limit = 8;
+      const skip = page * limit;
+      const options = {
+        // Include only the `title` and `imdb` fields in each returned document
+        projection: { picture: 1 },
+      };
+      const cursor = toysCollection.find({}, options);
+      const result = await cursor.limit(9).toArray();
+      res.send(result);
+    });
     //
     app.get('/total-toys', async (req, res) => {
       const result = await toysCollection.estimatedDocumentCount();
@@ -176,10 +190,6 @@ async function run() {
         const result = await cursor.toArray();
         res.send(result);
       }
-
-
-
-      
     });
   } finally {
     // Ensures that the client will close when you finish/error
