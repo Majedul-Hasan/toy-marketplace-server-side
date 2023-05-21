@@ -97,7 +97,18 @@ async function run() {
       const result = await cursor.limit(9).toArray();
       res.send(result);
     });
-    //
+    // new arived
+    app.get('/toys-new', async (req, res) => {
+      console.log(req.query);
+
+      const cursor = toysCollection.find({});
+      const result = await cursor
+        .sort({ createdAt: -1 })
+        .collation({ locale: 'en_US', numericOrdering: true })
+        .limit(6)
+        .toArray();
+      res.send(result);
+    });
     app.get('/total-toys', async (req, res) => {
       const result = await toysCollection.estimatedDocumentCount();
       res.send({ totalNumberOfToys: result });
