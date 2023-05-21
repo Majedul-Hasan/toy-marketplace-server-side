@@ -46,26 +46,47 @@ async function run() {
       return res.send(blog);
     });
 
-      app.get('/blogs-list', async (req, res) => {
-        //  dbConnect()
-        const query = {};
-        const options = {
-          // Include only the `title` and `imdb` fields in the returned document
-          projection: { title: 1, slug: 1 },
-        };
+    app.get('/blogs-list', async (req, res) => {
+      //  dbConnect()
+      const query = {};
+      const options = {
+        // Include only the `title` and `imdb` fields in the returned document
+        projection: { title: 1, slug: 1 },
+      };
 
-        const cursor = blogsCollection.find(query, options);
-        const result = await cursor.toArray();
-        res.send(result);
-      });
-
-
-
-
-    app.get('/toys', async (req, res) => {
-      const cursor = toysCollection.find({});
+      const cursor = blogsCollection.find(query, options);
       const result = await cursor.toArray();
       res.send(result);
+    });
+    // update blog
+
+    app.patch('/blogs/:slug', async (req, res) => {
+      const slug = req.params.slug;
+      const filter = { slug: slug };
+      const updatedBlog = req.body;
+      // console.log(updatedBooking);
+      const updateDoc = {
+        $set: {
+          users: updatedBlog.status,
+        },
+      };
+      const result = await bookingCollection.updateOne(filter, updateDoc);
+      res.send(result);
+    });
+
+    app.get('/toys', async (req, res) => {
+      console.log(req.query);
+      const page = parseInt(req.query.page) || 0;
+      const limit = 8;
+      const skip = page * limit;
+      const cursor = toysCollection.find({});
+      const result = await cursor.skip(skip).limit(limit).toArray();
+      res.send(result);
+    });
+    //
+    app.get('/total-toys', async (req, res) => {
+      const result = await toysCollection.estimatedDocumentCount();
+      res.send({ totalNumberOfToys: result });
     });
     // single toy creation
     app.post('/toys', verifyJWT, async (req, res) => {
