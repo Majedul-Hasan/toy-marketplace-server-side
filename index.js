@@ -97,6 +97,17 @@ async function run() {
       const result = await cursor.limit(9).toArray();
       res.send(result);
     });
+    // new Trending
+
+    app.get('/toys-trending', async (req, res) => {
+      const cursor = toysCollection.find({});
+      const result = await cursor
+        .sort({ rating: -1 })
+        .collation({ locale: 'en_US', numericOrdering: true })
+        .limit(6)
+        .toArray();
+      res.send(result);
+    });
     // new arived
 
     app.get('/toys-new', async (req, res) => {
@@ -111,7 +122,7 @@ async function run() {
       res.send(result);
     });
 
-    // new tave
+    // category
     app.get('/toys-cate', async (req, res) => {
       console.log(req.query);
       const options = {
